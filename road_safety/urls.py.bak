@@ -15,11 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from django.conf.urls import url,include
-from road_safety import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    url(r'^$',views.index,name='index'), #load index.html the first page
-    url(r'users/',include("users.url")),
 ]

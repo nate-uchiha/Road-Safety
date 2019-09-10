@@ -51,7 +51,7 @@ class UserProfile(AbstractUser):
         return 'user_{0}/{1}'.format(instance.user.id, filename)
 
     username = models.CharField(_("Username"),max_length=100,unique=True,blank=False)
-    password = models.CharField(_("Password"),max_length=100)
+    password = models.CharField(_("Password"),max_length=30)
     email = models.CharField(_("Email"),max_length=256,unique=True,)
     mobile = models.CharField(_("Password"),max_length=30)
     first_name = models.CharField(_("Password"),max_length=30)
