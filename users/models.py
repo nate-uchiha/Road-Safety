@@ -1,0 +1,96 @@
+from django.db import models
+from django.contrib.auth.models import AbstractUser,BaseUserManager
+from django.utils.translation import ugettext_lazy as _
+# Create your models here.
+class UserProfileManager(BaseUserManager):
+    def create_user(self,username,email,password,mobile,first_name,last_name):
+        print("Validating all credentials.....")
+        if not username:
+            raise ValueError("You must specify Username")
+        elif not email:
+            raise ValueError("You must specify email address")
+        elif not mobile:
+            raise ValueError("You must specify Mobile Number")
+        elif not first_name:
+            raise ValueError("You must specify First Name")
+        elif not last_name:
+            raise ValueError("You must specify Last Name")
+        print("Creating User Please wait....")
+        user = self.model(
+            username = username,
+            email = self.normalize_email(email),
+            mobile = mobile,
+            first_name = first_name,
+            last_name = last_name,
+        )
+
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_staffuser(self,username,email,password,mobile,first_name,last_name ):
+
+        user = self.create_user(
+            username = username,
+            email = email,
+            password = password,
+            mobile = mobile,
+            first_name = first_name,
+            last_name = last_name,
+        )
+        user.staff = True
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self,username,email,password):
+        """
+        Creates and saves a superuser with the given email and password.
+        """
+        print("Creating Super User Please wait....")
+        user = self.create_user(
+            username = username,
+            email = email,
+            password = password,
+            mobile = "9920327934",
+            first_name = "Nate",
+            last_name = "River"
+        )
+        user.staff = True
+        user.admin = True
+        user.save(using=self._db)
+        return user
+
+class UserProfile(AbstractUser):
+    def user_directory_path(instance, filename):
+        # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+        return 'user_{0}/{1}'.format(instance.user.id, filename)
+
+    username = models.CharField(_("Username"),max_length=100,unique=True,blank=False)
+    password = models.CharField(_("Password"),max_length=30)
+    email = models.CharField(_("Email"),max_length=256,unique=True,)
+    mobile = models.CharField(_("Password"),max_length=30)
+    first_name = models.CharField(_("Password"),max_length=30)
+    last_name = models.CharField(_("Password"),max_length=30)
+    avatar = models.FileField(_("Password"),upload_to=user_directory_path)
+    is_active = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
+
+    objects = UserProfileManager()
+
+    def __str__(self):
+        return self.username
+
+    def has_perm(self,perm,obj=None):
+        # have to provide a check later for all permissions
+        return True
+
+    def has_module_perms(self,app_label):
+        #Check for permissions to view the app
+        return True
+
+    @property
+    def is_staff(self):
+        #check to see if staff,
+        return True
+
+    verbose_name = 'Users'
